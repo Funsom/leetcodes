@@ -53,4 +53,4 @@ now it has been modified by Yucong Wei
   326  vi test.txt
   327  git log
   328  history
-
+  meaningless string
