@@ -83,7 +83,9 @@ class KDTree(object):
             return re[0][0]
         """
         self.root = KDNode() #定义根节点，分割纬度是使得样本点方差最大的纬度，需要分割的样本点为全数据
+        
         k = len(data[0])
+        self.k = k
         head = self.root
         split = 0
         queue = [(head,data)]
@@ -108,7 +110,36 @@ class KDTree(object):
                 root.right = KDNode()
                 queue.append((root.right,data_set[median+1:n]))
             split = (split + 1) % k
- 
+    def add(self,point):
+        root = self.root
+        while root:
+            split = root.split
+            if point[split] < root.point[split] and not root.left :
+                root.left = KDNode(point,(split + 1) % self.k)
+                break
+            elif point[split] > root.point[split] and not root.right :
+                root.right = KDNode(point,(split + 1) % self.k)
+                break
+            elif point[split] < root.point[split]:
+                root = root.left
+            elif point[split] > root.point[split]:
+                root = root.right
+        return self.root
+    def levelOrder(self):
+        cur_layer = [self.root]
+        res = []
+        while cur_layer:
+            temp = []
+            next_layer = []
+            for i in cur_layer:
+                temp.append(i.point)
+                if i.left: next_layer.append(i.left)
+                if i.right: next_layer.append(i.right)
+            cur_layer = next_layer
+            res.append(temp)
+        return res
+    
+    
 def computeDist(pt1, pt2):
     """
     计算两个数据点的距离
@@ -257,12 +288,16 @@ if __name__ == "__main__":
     data = [tuple([float(a) for a in i.split(',')])  for i in data]
     
     kdtree = KDTree(data)
+    kdtree.add([117.2445,34.26261])
     #preOrder(kdtree.root)
     for ind,i in enumerate(data):
         knn = searchKDTree(kdtree, i, k=1)
-        print(ind,knn[1])
+        #print(ind,knn[1])
     
-    
+    #knn = searchKDTree(kdtree, [117.2445,34.26261], k=1)
+    #print(knn[1])
+    for ind,i in enumerate(kdtree.levelOrder()):
+        print(ind,i)
     
     
     
