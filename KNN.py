@@ -112,15 +112,23 @@ class KDTree(object):
             split = (split + 1) % k
     def add(self,point):
         root = self.root
+        def equal(a,b):
+            for i,j in zip(a,b):
+                if i != j:
+                    return False
+            return True
+
+
         while root:
             split = root.split
+            if equal(point,root.point): break
             if point[split] < root.point[split] and not root.left :
                 root.left = KDNode(point,(split + 1) % self.k)
                 break
             elif point[split] > root.point[split] and not root.right :
                 root.right = KDNode(point,(split + 1) % self.k)
                 break
-            elif point[split] < root.point[split]:
+            elif point[split] <= root.point[split]:
                 root = root.left
             elif point[split] > root.point[split]:
                 root = root.right
@@ -283,23 +291,11 @@ def classify0(inX, dataSet, labels, k):
 
 
 if __name__ == "__main__":
-    f = open(r'D:\Users\Illusion\Desktop\Desktop.csv','r')
-    data = f.readlines()
-    data = [tuple([float(a) for a in i.split(',')])  for i in data]
     
-    kdtree = KDTree(data)
-    kdtree.add([117.2445,34.26261])
-    #preOrder(kdtree.root)
-    for ind,i in enumerate(data):
-        knn = searchKDTree(kdtree, i, k=1)
-        #print(ind,knn[1])
-    
-    #knn = searchKDTree(kdtree, [117.2445,34.26261], k=1)
-    #print(knn[1])
+    kdtree = KDTree([(1,2),(3,2),(1,3)])
+    kdtree.add((1,3))
     for ind,i in enumerate(kdtree.levelOrder()):
         print(ind,i)
-    
-    
     
     
     
