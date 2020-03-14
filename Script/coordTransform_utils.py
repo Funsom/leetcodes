@@ -3,6 +3,7 @@ import json
 import urllib
 import math
 import csv
+import matplotlib.pyplot as plt
 from pyproj import Transformer, transform
 
 x_pi = 3.14159265358979324 * 3000.0 / 180.0
@@ -164,23 +165,126 @@ def out_of_china(lng, lat):
 
 if __name__ == '__main__':
     
-    dirName = r'C:\Users\Illusion\Desktop\reTable.csv'
+    
+    Flag = False
+    if Flag:
+        dirName = r'D:\Users\Illusion\Desktop\pipe.csv'
+        csvFile = open(dirName,'r',newline = '')
+        file = csvFile.readlines()
+        writeFile = open(r'D:\Users\Illusion\Desktop\trans1.csv','w',newline = '')
+        i = 0 
+        for f in file:
+            i = i+1
+            points = f.split(',,')
+            y,x = points[0].split(",")
+            y1,x1 = points[1].split(",")
+            print(i)
+            
+            lat,lng = transform(2437, 4326, x,y)
+            lat1,lng1 = transform(2437, 4326, x1,y1)
+            
+            lng,lat = wgs84_to_bd09(float(lng), float(lat))
+            lng1,lat1 = wgs84_to_bd09(float(lng1), float(lat1))
+            
+            #plt.plot([lat,lat1],[lng,lng1])
+            result6 = str(lng)+',' + str(lat) + ',,'
+            result6 += str(lng1)+','+str(lat1)
+            
+            #print(result6)
+            writeFile.write(str(result6))
+            writeFile.write("\n")
+        #plt.show()
+        csvFile.close()
+        writeFile.close()
+    if not Flag:
+        csvFile = open(r'D:\Users\Illusion\Desktop\trans1.csv','r')
+        writeFile = open(r'D:\Users\Illusion\Desktop\tranWithNodeID.csv','w',newline = '')
+        writeNodeFile = open(r'D:\Users\Illusion\Desktop\tranNodeWithID.csv','w',newline = '')
+        file = csvFile.readlines()
+        pipeWithNodeID = []
+        pointSet = set()
 
-    csvFile = open(dirName,'r',newline = '')
-    file = csvFile.readlines()
-    writeFile = open(r'C:\Users\Illusion\Desktop\nodeLocation.csv','w',newline = '')
-    i =0 
-    for f in file:
-        i = i+1
-        y = f.split(",")[0]
-        x = f.split(",")[1]
-        print(i)
+        for f in file:
+
+            points = f.split(',,')
+            lng,lat = points[0].split(",")
+            lng,lat = float(lng),float(lat)
+            lng1,lat1 = points[1].split(",")
+            lng1,lat1 = float(lng1),float(lat1)
+            pointSet.add((lng,lat))
+            pointSet.add((lng1,lat1))
+        pointDict = {}
         
-        lat,lng = transform(2436, 4326, x,y)
-        result6 = wgs84_to_bd09(float(lng), float(lat))
-        print(result6)
-        writeFile.write(str(result6))
-        writeFile.write("\n")
-    csvFile.close()
-    writeFile.close()
+        for i,p in enumerate(pointSet):
+            pointDict[p] = i + 1
         
+        for ind,f in enumerate(file):
+
+            points = f.split(',,')
+            lng,lat = points[0].split(",")
+            lng,lat = float(lng),float(lat)
+            lng1,lat1 = points[1].split(",")
+            lng1,lat1 = float(lng1),float(lat1)
+            x = pointDict[(lng,lat)]
+            y = pointDict[(lng1,lat1)]
+            pipeWithNodeID.append((ind,(x,y)))
+            
+        for i in pipeWithNodeID:
+            writeFile.write(str(i[0]))
+            writeFile.write(',')
+            writeFile.write(str(i[1][0]))
+            writeFile.write(',')
+            writeFile.write(str(i[1][1]))
+            writeFile.write('\n')
+        writeFile.close()
+        
+        for k,v in pointDict.items():
+            writeNodeFile.write(str(v))
+            writeNodeFile.write(',')
+            writeNodeFile.write(str(k))
+            writeNodeFile.write('\n')
+        writeNodeFile.close()
+            #print(i,lng,lat)
+            #plt.plot([lng,lng1],[lat,lat1])
+        minDist = float('inf')
+        minDist1 = float('inf')
+        target = (119.436071,31.831451)
+        target1 = (119.437183,31.831137)
+        res = None
+        res1 = None
+        for i in pointSet:
+            dist = (i[0] - target[0])**2 + (i[1]-target[1])**2
+            dist1 = (i[0] - target1[0])**2 + (i[1]-target1[1])**2
+            if dist < minDist:
+                minDist = dist
+                res = i
+            if dist1 < minDist:
+                minDist1 = dist
+                res1 = i
+        ind = pointDict[res]
+        ind1 = pointDict[res1]
+        
+        pointList = [(119.436071,31.831451),(119.437183,31.831137),
+                     (119.490073,31.790366),(119.46081,31.794128),
+                     (119.46094,31.79416),(119.371763,31.724525),
+                     (119.470426,31.740391),(119.585601,31.766359),
+                     (119.709443,31.709677)
+                     ]
+#        for i in pointList:
+#            plt.scatter(i[0],i[1],marker='*')
+#            
+#        plt.show()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

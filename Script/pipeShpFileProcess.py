@@ -191,6 +191,20 @@ if __name__ == '__main__':
     higGovernorPath = "C:/Users/Illusion/Desktop/XZTransShp/OFFTAKE_N.shp"
     terminalPath = "C:/Users/Illusion/Desktop/XZTransShp/TERMINTR_N.shp"
     
+    a = open(r"D:\Users\Illusion\Desktop\a.txt","w")
+    tempPath = r"D:\GWFZ\DOCUMENT\JinTanGIS\PIPESECTIONMPA.shp"
+    temp = shapefile.Reader(tempPath,encoding='gbk')
+    tempShapes = temp.shapes()
+    tempRecords = temp.records()
+    tempFields =  temp.fields
+    for i in tempShapes:
+        a.write(str(i.points))
+        a.write('\n')
+    a.close()
+        
+    
+    
+    
     pipe = shapefile.Reader(pipePath,encoding='utf8')
     elbow = shapefile.Reader(elbowPath,encoding='utf8')
     valve = shapefile.Reader(valvePath,encoding='utf8')
