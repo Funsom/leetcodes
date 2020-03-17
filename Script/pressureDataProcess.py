@@ -2,6 +2,12 @@
 """
 Created on Thu Mar 12 10:04:02 2020
 
+1. 文件读取
+2. 文件处理与绘图
+3. 监督学习数据分类
+4. 非监督学习数据聚类
+5. 将数据存到本地数据库，但批量插入数据效率较低，文件量大时可以考虑
+
 @author: Illusion
 """
 
@@ -20,7 +26,9 @@ import time
 import pymssql
 
 
-#import decimal
+'''
+MS数据库操作类
+'''
 class MSSQL:
     def __init__(self, host, user, pwd, db):
         self.host = host
@@ -55,7 +63,9 @@ class MSSQL:
         self.connect.close()
         return resList
 
-
+'''
+将数据存到MS数据库中
+'''
 def sqlProcess(dataToSql):
     ms = MSSQL(host="DESKTOP-2II5G8E",
                user="sa",
@@ -76,8 +86,11 @@ def sqlProcess(dataToSql):
                 VALUES ('{0}','{1}','{2}','{3}')".format(d['company'],d.name,d['进口压力(kPa)'],d['出口压力(kPa)']))
             
 
-
-def func(filename, picstr, batchSize, dataList, deviceID,dataToSql, isPrint=True,isFilter=False):
+'''
+文件处理函数
+有点臃肿，检具文件读取，处理与图像绘制的功能
+'''
+def fileProcess(filename, picstr, batchSize, dataList, deviceID,dataToSql, isPrint=True,isFilter=False):
     excel = pd.read_excel(filename,
                           header=[4],
                           dtype={'对象': np.datetime64},
@@ -214,13 +227,14 @@ if __name__ == "__main__":
     dataList = []
     dataToSql = []
     for i in range(n):
-        func(filenameList[i],
+        fileProcess(filenameList[i],
              picstrList[i],
              batchSizeList[i],
              dataList,
              deviceIDList[i],
              dataToSql,
              isPrint=False)
+    # KMean 聚类
     kmData =  [i for i in dataList if  not i.isnull().values.any() ]
     kmTrain =  [np.array(i[['进口压力(kPa)', '出口压力(kPa)']]) for i in dataList if  not i.isnull().values.any() ]
     # max_min
@@ -256,6 +270,7 @@ if __name__ == "__main__":
     
     #sqlProcess(dataToSql)
     '''
+    # ANN 分类，需要数据标注
     LabelList = []
     # 下面开始处理训练的问题
     x_input = [np.array(i) for i in dataList if not i.isnull().values.any()]
