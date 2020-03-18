@@ -1,4 +1,31 @@
 # -*- coding: utf-8 -*-
+'''
+1. 读取shp, dbf, shx 文件
+2. 根据shp文件建立拓扑关系
+2.1 先读取所有管道的坐标点，去重，重新编号建立字典，然后以坐标点为键查出编号
+2.2 读取所有阀门等点坐标信息，以坐标点为键，将节点属性赋予字典的值
+2.3 将MultiPolyline拆分成n-1根管道，长度属性根据经纬度距离计算
+2.4 使用networkX包，生成无向图模型，获取连通分量和连通子图
+3. 以孤立子图中离其他子图内节点的距离最短的原则，建立虚拟管道，使管网变全连通
+（也可以采用合并节点的方法，设计节点赋值的问题未实现）
+4. 用dxfwrite包生成DXF文件，并将不同孤立部分用颜色区分，直观显示结果
+
+
+
+######### shp 文件附录 其中前三个是必备的 ###########
+.shp— 图形格式，用于保存元素的几何实体。
+.shx— 图形索引格式。几何体位置索引，记录每一个几何体在shp文件之中的位置，能够加快向前或向后搜索一个几何体的效率。
+.dbf— 属性数据格式，以dBase IV的数据表格式存储每个几何形状的属性数据。
+.prj— 投帧式，用于保存地理坐标系统与投影信息，是一个存储well-known text投影描述符的文本文件。
+.sbnand.sbx— 几何体的空间索引
+.fbnand.fbx— 只读的Shapefiles的几何体的空间索引
+.ainand.aih— 列表中活动字段的属性索引。
+.ixs— 可读写Shapefile文件的地理编码索引
+.mxs— 可读写Shapefile文件的地理编码索引(ODB格式)
+.atx—.dbf文件的属性索引，其文件名格式为shapefile.columnname.atx(ArcGIS 8及之后的版本)
+.shp.xml— 以XML格式保存元数据。
+.cpg— 用于描述.dbf文件的代码页，指明其使用的字符编码。
+'''
 import json
 import urllib
 import math
@@ -190,6 +217,10 @@ if __name__ == '__main__':
     midGovernorPath = "C:/Users/Illusion/Desktop/XZTransShp/ZGOVERNOR_N.shp"
     higGovernorPath = "C:/Users/Illusion/Desktop/XZTransShp/OFFTAKE_N.shp"
     terminalPath = "C:/Users/Illusion/Desktop/XZTransShp/TERMINTR_N.shp"
+    
+
+    
+    
     
     pipe = shapefile.Reader(pipePath,encoding='utf8')
     elbow = shapefile.Reader(elbowPath,encoding='utf8')
@@ -564,7 +595,7 @@ if __name__ == '__main__':
     result = [len(c) for c in sorted(nx.connected_components(G), key=len, reverse=True)]
     
     
-    subG = [c for c in sorted(nx.connected_component_subgraphs(G), key=len, reverse=True)]
+    subG = [c for c in sorted(nx.connected_components(G), key=len, reverse=True)]
     
 # =============================================================================
 #    计算不同集合内点的距离
