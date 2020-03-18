@@ -14,13 +14,24 @@
 
 class Solution:
     def isBalanced(self, root: TreeNode) -> bool:
-        def depth(root):
-            if not root: return 0
-            left = depth(root.left)
-            if left == -1:return -1
-            right = depth(root.right)
-            if right == -1: return -1
-            return max(left,right) + 1 if abs(left - right) < 2 else -1
-        return depth(root) != -1
+        if not root: return 0
+        
+        def depths(root,depth):
+            nonlocal maxs,dep
+            if not root.left and not root.right:
+                depth += 1
+                maxs = max(maxs,depth)
+                dep.append(depth)
+                return
+            depth += 1
+            if root.left:
+                depths(root.left,depth)
+            if root.right:
+                depths(root.right,depth)
+        maxs = 0
+        dep = []
+        depths(root,0)
+        print(maxs,dep)
+        return (maxs - min(dep)) <= 1
 # @lc code=end
 
