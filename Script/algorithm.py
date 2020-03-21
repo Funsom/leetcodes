@@ -42,24 +42,25 @@ class SortAlgorithm(object):
         self.__QuickSort__(lists,j+1,hi) 
         
     def __partition__(self,lists,lo,hi):
-        i,j = lo+1,hi-1
+        i,j = lo+1,hi
         v = lists[lo]
         while True:
-            while lists[i] < v:
+            while lists[i] <= v:
                 i += 1
                 if i == hi:
                     break 
-            while lists[j] > v:
+            while lists[j] >= v:
                 j -= 1
                 if j == lo:
                     break
             if i >= j:
                 break
-
+            lists[i],lists[j] = lists[j],lists[i]
         lists[lo],lists[j] = lists[j],lists[lo]
+        
         return j
 if __name__ == "__main__":
-    lists = [100,2,0,80,78]
+    lists = [100,100,100,1]
     sortAlgorithm = SortAlgorithm()
     #res = sortAlgorithm.SelectionSort(lists)
     #res = sortAlgorithm.InsertionSort(lists)
