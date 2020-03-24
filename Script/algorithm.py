@@ -57,7 +57,6 @@ class SortAlgorithm(object):
                 break
             lists[i],lists[j] = lists[j],lists[i]
         lists[lo],lists[j] = lists[j],lists[lo]
-        
         return j
 if __name__ == "__main__":
     lists = [100,100,100,1]
