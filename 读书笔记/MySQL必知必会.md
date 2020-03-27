@@ -74,3 +74,58 @@
 + 下划线通配符（_）下划线通配符只匹配一个任意字符而不是多个字符
 + 通配符的使用是有代价的，将通配符的匹配位置放在开头是最慢的
 ## 第九章 用正则表达式进行搜索
++ REGEXP  
+  + 进行OR匹配 
+  + select name from products where name regexp '1000|2000' order by name;
+  + 匹配几个字符之一
+  + [123] == 1|2|3
+  + 匹配范围
+  + [0-9][a-z][A-Z]
+  + 匹配特殊字符
+  + '\\\\.'双斜杠转义 \\\\\\ 反斜杠 \\\\f 换页 \\\\n 换行 \\\\r 回车 \\\\t 制表 \\\\v 纵向制表
+  + 匹配字符类
+  + [:alnum:] 任意字母与数字
+  + 匹配多个实例
+  + \* 0到多 \+ 1到多 ? 0到1 {n} 指定数目 {n,}不少于n次 {n,m} 在范围内
+  + 定位符
+  + ^ 开头 $ 结尾 [[:<:]] 词的开头 [[:>:]] 词的结尾
+  + LIKE与REGEXP的区别 ： LIKE匹配整个串 REGEXP匹配子串
+## 第十章 创建计算字段
++ 字段(field) 基本上与column的意思相同，不过数据库列一般称为列，而术语字段通常用于在计算字段的连接上。
++ 拼接字段 concatenate Concat() select Concat(name,'(',country,')') from vendors order by name; Concat() 拼接串，即把多个串连接起来形成一个较长的串
++ RTrim(...) 去掉值右边的所有空格
++ 使用别名 AS select Concat(name,'(',country,')') as title from vendors order by name;
++ 执行算术计算 select id,quantity, price, quantity*price as expanded_price from orderitems where order_num = 20005;
+## 第十一章 使用数据处理函数
++ 文本处理函数
+  + Upper(...) 将文本转换成大写 
+  + Left() 返回串左边的字符
+  + Length() 返回串的长度
+  + Locate() 找出串的一个子串
+  + Lower() 将串转换为小写
+  + LTrim() 去掉串左边的空格
+  + Right() 返回串右边的字符
+  + RTrim() 去掉串右边的空格
+  + Soundex() 返回串的SOUNDEX值 SOUNDEX是一个将任何文本串转换为描述其语音表示的字母数字模式的算法
+  + SubString() 返回子串的字符
++ 日期和时间处理函数
+  + AddDate() AddTime() CurDate() 当前日期 CurTime() 当前时间 Date() 日期
+  + DateDiff() Year() Now()
+  + select id,name from orders where Date(order_date) = '2005-09-01';
+  + 检索2005年9月的数据
+    + select id,name from orders where Date(order_date) between '2005-09-01' and '2005-09-30';
+    + select id,name from orders where Year(order_date) = 2005 and Month(order_date) = 9;
+  + 数值处理函数
+    + Abs() Cos() Exp() 指数值 Mod() Pi() Rand() 随机数 Sin() Sqrt() Tan()
+## 第十二章 汇总数据
++ 聚合函数 aggregate function
+  + AVG() COUNT() MAX() MIN() SUM() 
+  + select AVG(price) AS avg_price from products where id = 1003;
+  + AVG() 只能用来确定特定数值列的平均值，而且列名必须作为函数参数给出，为获得多个列的平均值必须使用多个AVG()函数 忽略NULL
+  + COUNT() COUNT(*)对表中的行进行计数，COUNT(column)对指定列中具有值的行进行计数，忽略NULL select COUNT(email) as num_cust from customers;
+  + MAX() 返回指定列中的最大值 select MAX(price) AS max_price from products;
++ 聚合不同值
+  + select AVG(distinct price) AS avg_price from products where id = 1003;
++ 组合聚合函数
+  + select COUNT(*) AS num_items,MIN(prod_price) AS price_min, MAX(prod_price) AS price_max, AVG(prod_price) AS price_avg from products;
+## 第十三章 分组数据

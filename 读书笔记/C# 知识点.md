@@ -108,3 +108,8 @@
     + 命名的参数： r.MoveAndResize(x: 30,y: 40, width: 20, height: 40);
     + 可选参数： public void test(int notOptionNumber,int optionNumber = 42){;} 调用时test(11);okay,test(11,22);okay.
     + 个数可变的参数： function(params int[] data);如果要把不同类型的参数传递给方法，就可以使用object数组
+
++ 强制转换与as、is运算符
+  + 强制转换不成功会抛出InvalidCastException
+  + as 运算符返回对象的引用，不抛异常，但如果对象不是所需要的类型，这个运算符就返回null
+  + is 运算符 根据条件是否满足，对象是否使用指定的类型，返回true或false，验证条件是true，可以进行类型转换
