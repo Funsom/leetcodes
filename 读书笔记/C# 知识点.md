@@ -52,7 +52,7 @@
 + 善用枚举
 + 命名空间 CompanyName.ProjectName.SystemSection
 + 指定命名空间的别名 using alias = NamespaceName
-+ 添加xml注释 /summary>returns/> param/>/summary>
++ 添加xml注释 /summary>returns/> param name="x"/>/summary>
 + <font color=red>***C# 预处理指令***</font>
   + #defind 与 #undef
     + #define 本身没什么用，但与其他预处理器指令（特别是#if）结合使用时，它的功能就非常强大了。预处理指令不用分号结束
@@ -105,4 +105,6 @@
     + 表达式体方法 public bool IsSquare(Rectangle rect) => rect.Height == rect.Width;
     + 调用方法 静态方法通过类名调用，非静态方法公有方法通过实例化对象调用
     + 方法重载 方法的几个版本有不同的签名（即，方法名相同，但参数的个数或数据类型不同，返回值不同不算，参数名称不同不算）
-    + 
+    + 命名的参数： r.MoveAndResize(x: 30,y: 40, width: 20, height: 40);
+    + 可选参数： public void test(int notOptionNumber,int optionNumber = 42){;} 调用时test(11);okay,test(11,22);okay.
+    + 个数可变的参数： function(params int[] data);如果要把不同类型的参数传递给方法，就可以使用object数组
