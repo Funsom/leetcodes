@@ -129,3 +129,68 @@
 + 组合聚合函数
   + select COUNT(*) AS num_items,MIN(prod_price) AS price_min, MAX(prod_price) AS price_max, AVG(prod_price) AS price_avg from products;
 ## 第十三章 分组数据
++ 数据分组
+  + select id,COUNT(*) AS nums from products group by id;
+  + group by 在 where之后，order by 之前
++ 过滤分组
+  + where只能过滤行，不能过滤分组
+  + having 过滤分组 having 支持所有的where操作符
+  + select id,COUNT(\*) as orders from orders group by id having COUNT(\*)>=2;
+  + having与where的差别 这里有另一种理解方法，where在数据分组前进行过滤，having在数据分组后进行过滤。这是一个重要的区别，where排除的行不包括在分组中。这可能会改变计算值，从而影响having子句中基于这些值过滤掉的分组。
+  + select id,COUNT(\*) as nums from products where price >= 10 group by id having COUNT(\*)>=2;
++ 分组和排序
+  + select num,sum(quantity\*price) AS ordertotal from orderitems group by num having sum(quantity\*price)>=50 order by ordertotal;
+## 第十四章 使用子查询
++ 利用子查询进行过滤
+  + 两张表 订单表与客户表
+  + 现在需要列出订购物品TNT2的所有客户
+  + 步骤：
+  + 1. 检索包含物品TNT2的所有订单的编号
+  + 2. 检索具有前一步骤列出的订单编号的所有客户的ID
+  + 3. 检索前一步骤返回的所有客户ID的客户信息。
+  + select cust_id from orders where order_num in (select order_num from orderitems where prod_id = 'TNT2');
++ 作为计算字段使用子查询
+  + 假如需要显示customers表中每个客户的订单总数。订单与相应的客户ID储存在orders表中，为了执行这个操作，遵循下面的步骤。
+  + (1) 从customer表中检索客户列表
+  + (2) 对于检索出的每个客户，统计其在orders表中的订单数目。
+  + select cust_name,cust_state,(select count(*) from orders where orders.cust_id=customers.cust_id) AS orders from customers order by cust_name; 完全限定列名
+## 第十五章 联结表
++ 联结(join)
+  + 主键（primary key） 一列或一组列，其值能够唯一区分表中的每个行
+  + 外键（foreign key） 外键为某个表中的一列，它包含另一个表的主键值，定义了两个表之间的关系。
+  + 可伸缩性（scale）能够适应不断增加的工作量而不失败。设计良好的数据库或应用程序称之为可伸缩性好
+  + 完全限定列名  在引用的列可能出现二义性时，必须使用完 全限定列名（用一个点分隔的表名和列名）
+  + 笛卡尔积 由没有联结条件的表关系返回 的结果为笛卡儿积。检索出的行的数目将是第一个表中的行数乘 以第二个表中的行数。
+  + 内部联结 Inner join on 
+  + 联结多个表 select prod_name,vend_name,prod_price,quantity from orderitems, products,vendors where products.vend_id = vendors,vend_id and orderitems.prod_id = products.prod_id and order_num = 20005;
+  + 联结的表越多，性能下降越厉害
+  + 有的子查询可以用联结代替
+    + select cust_name,cust_contact from customers where cust_id in (
+    select cust_id from orders where order_num in (select order_num from orderitems where prod_id = 'TNT2'));
+    + select cust_name,cust_contact from customers,orders,orderitems where customers.cust_id = orders.cust_id and orderitems.order_num = orders.order_num and prod_id = 'TNT2';
+## 第十六章 创建高级联结
++ 使用表别名 缩短SQL语句 允许在单条select语句中多次使用相同的表
+  + select cust_name,cust_contact from customers as c, orders as o, orderitems as oi where c.cust_id = o.cust_id and oi.order_num = o.order_num and prod_id = 'TNT2';
++ 使用不同类型的联结
+  + 自联结 自联结比子查询性能好
+    + select p1.prod_id,p1.prod_name from products as p1, products as p2
+    + where p1.vend_id = p2.vend_id and p2.prod_id = 'DTNTR'
+  + 自然联结 select c.*,o.order_num,o.order_date,oi.prod_id,oi.quantity,oi.item_price from customers as c, orders as o, orderitems as oi,where c.cust_id = o.cust_id and oi.order_num = o.order_num and prod_id = 'FB';
+  + 外部联结 在需要包含没有关联行的那些行
+    + select customers.cust_id,orders.order_num from customers left outer join orders on customers.cust_id = orders.cust_id;
+  + 使用带聚合函数的联结
+    + 检索所有客户及每个客户所下的订单数
+    + select customers.cust_name, customer.cust_id,COUNT(orders.order_num) as num_ord from customers inner join orders on customers.cust_id = orders.cust_id group by customers.cust_id; 
+    + 使用左外部联结来包含所有客户，甚至包含那些没有任何下订单的客户。
+  + 使用联结和联结条件
+    + 一般使用内部联结，但使用外部联结也是有效的
+    + 保证使用正确的联结条件
+    + 应该总是提供联结条件
+    + 在一个联结中可以包含多个表
+## 第十七章 组合查询 
++ 本章讲述如何利用UNION操作符将多条select语句组合成一个结果
++ UNION规则
+  + UNION 必须由两条或者两条以上的SELECT语句组成
+  + UNION 中的每个查询必须包含相同的列、表达式或聚合函数
++ 可包含重复的行 UNION ALL
++ 在用UNION组合查询时，只能使用一条ORDER BY子句，它必须出现在最后一条SELECT语句之后，不允许使用多条order by子句
